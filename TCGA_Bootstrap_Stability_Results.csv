@@ -1,0 +1,9 @@
+"Metric","Value"
+"N_bootstraps",1000
+"Mean_ARI",0.9588
+"Median_ARI",0.9618
+"SD_ARI",0.0286
+"Q2.5_ARI",0.888
+"Q97.5_ARI",0.9904
+"Min_ARI",0.8222
+"Max_ARI",1

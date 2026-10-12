@@ -1,0 +1,27 @@
+Call:
+coxph(formula = Surv(OS_time, OS_event) ~ FGA + Aneuploidy_Score + 
+    logTMB + AGE + SEX, data = analysis_final)
+
+  n= 425, number of events= 211 
+
+                      coef exp(coef)  se(coef)      z Pr(>|z|)    
+FGA               0.673721  1.961522  0.479079  1.406  0.15964    
+Aneuploidy_Score -0.015359  0.984758  0.025868 -0.594  0.55267    
+logTMB           -0.191779  0.825489  0.063080 -3.040  0.00236 ** 
+AGE               0.027734  1.028122  0.004933  5.622 1.89e-08 ***
+SEXMale           0.244675  1.277206  0.150856  1.622  0.10482    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                 exp(coef) exp(-coef) lower .95 upper .95
+FGA                 1.9615     0.5098    0.7670    5.0163
+Aneuploidy_Score    0.9848     1.0155    0.9361    1.0360
+logTMB              0.8255     1.2114    0.7295    0.9341
+AGE                 1.0281     0.9726    1.0182    1.0381
+SEXMale             1.2772     0.7830    0.9503    1.7166
+
+Concordance= 0.635  (se = 0.022 )
+Likelihood ratio test= 42.92  on 5 df,   p=4e-08
+Wald test            = 41.04  on 5 df,   p=9e-08
+Score (logrank) test = 41.96  on 5 df,   p=6e-08
+

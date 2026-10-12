@@ -1,0 +1,25 @@
+Call:
+coxph(formula = Surv(OS_time, OS_event) ~ Phenotype + AGE + SEX + 
+    logTMB, data = data)
+
+  n= 425, number of events= 211 
+
+                      coef exp(coef)  se(coef)      z Pr(>|z|)    
+PhenotypeGI-High -0.066889  0.935299  0.150356 -0.445  0.65641    
+AGE               0.027927  1.028321  0.004913  5.684 1.31e-08 ***
+SEXMale           0.219396  1.245324  0.150266  1.460  0.14428    
+logTMB           -0.183170  0.832626  0.064436 -2.843  0.00447 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                 exp(coef) exp(-coef) lower .95 upper .95
+PhenotypeGI-High    0.9353     1.0692    0.6966    1.2558
+AGE                 1.0283     0.9725    1.0185    1.0383
+SEXMale             1.2453     0.8030    0.9276    1.6718
+logTMB              0.8326     1.2010    0.7338    0.9447
+
+Concordance= 0.633  (se = 0.022 )
+Likelihood ratio test= 40.13  on 4 df,   p=4e-08
+Wald test            = 37.88  on 4 df,   p=1e-07
+Score (logrank) test = 38.69  on 4 df,   p=8e-08
+
