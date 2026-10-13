@@ -124,7 +124,7 @@ FEATURE_ORDER <- c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count")
 # 
 #' Classify melanoma samples as GI-High or GI-Low
 #'
-#' @param df A data.frame with columns FGA, Aneuploidy_Arm_Score, logTMB.
+#' @param df A data.frame with columns FGA, Aneuploidy_Arm_Score, log_mutation_count.
 #' @return The input data.frame with Cluster, Phenotype, dist_GI_High, and
 #'         dist_GI_Low appended.
 #' @export
