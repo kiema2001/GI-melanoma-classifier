@@ -7,8 +7,8 @@ centers <- fread(file.path(TCGA_RESULT, "TCGA_CLUSTER_CENTERS.csv"))
 tcga    <- fread(file.path(TCGA_RESULT, "TCGA_FINAL_TWO_PHENOTYPE_MODEL.csv"))
 
 # TCGA-derived means and SDs (used for MSK scaling)
-means <- apply(tcga[, c("FGA", "Aneuploidy_Arm_Score", "logTMB")], 2, mean)
-sds   <- apply(tcga[, c("FGA", "Aneuploidy_Arm_Score", "logTMB")], 2, sd)
+means <- apply(tcga[, c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count")], 2, mean)
+sds   <- apply(tcga[, c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count")], 2, sd)
 
 cat("TCGA-DERIVED SCALING PARAMETERS")
 cat("\nMeans (center):\n")
@@ -32,7 +32,7 @@ cat("GI-Low  is centroid row:", 3 - centroid_high, "\n")
 # classify_new_samples.R
 #
 # Purpose
-# -------
+#
 # Assign new melanoma samples to one of two genomic instability phenotypes
 # (GI-High or GI-Low) using the k-means classifier that was trained on the
 # TCGA Skin Cutaneous Melanoma (SKCM) discovery cohort (n = 425).
@@ -53,10 +53,10 @@ cat("GI-Low  is centroid row:", 3 - centroid_high, "\n")
 #
 #   FGA                   Fraction of genome altered (0 to 1)
 #   Aneuploidy_Arm_Score  Number of chromosome arms altered (integer)
-#   logTMB                log(1 + nonsynonymous mutation count)
+#   log_mutation_count    log(1 + nonsynonymous mutation count)
 #
 # Output
-# ------
+# 
 # The original data.frame with four additional columns:
 #
 #   Cluster         Integer cluster label (1 = GI-High, 2 = GI-Low)
@@ -65,41 +65,37 @@ cat("GI-Low  is centroid row:", 3 - centroid_high, "\n")
 #   dist_GI_Low     Squared Euclidean distance to the GI-Low centroid
 #
 # Usage
-# -----
+# 
 #   source("classify_new_samples.R")
 #
 #   my_samples <- data.frame(
 #     FGA                  = c(0.05, 0.45, 0.62),
 #     Aneuploidy_Arm_Score = c(2,    18,   27),
-#     logTMB               = c(3.2,  6.1,  6.8)
+#     log_mutation_count   = c(3.2,  6.1,  6.8)
 #   )
 #
 #   classify_GI(my_samples)
 #
-# =============================================================================
-
-
-# -----------------------------------------------------------------------------
+# 
 # SECTION 1. TCGA-DERIVED PARAMETERS (DO NOT MODIFY)
 #
 # These numbers are the means, standard deviations, and k-means centroids
 # extracted from the TCGA discovery cohort. They must remain unchanged so
 # that new samples are classified on exactly the same scale as the original
 # MSK validation.
-# -----------------------------------------------------------------------------
 
 # Feature means in the TCGA discovery cohort (used for centering)
 TCGA_MEANS <- c(
   FGA                  = 0.319367,
   Aneuploidy_Arm_Score = 11.117647,
-  logTMB               = 5.983047
+  log_mutation_count   = 5.983047
 )
 
 # Feature standard deviations in the TCGA discovery cohort (used for scaling)
 TCGA_SDS <- c(
   FGA                  = 0.206321,
   Aneuploidy_Arm_Score = 8.220734,
-  logTMB               = 1.192553
+  log_mutation_count   = 1.192553
 )
 
 # k-means cluster centroids in standardized (z-score) space.
@@ -110,7 +106,7 @@ TCGA_SDS <- c(
 # labeled GI-Low.
 TCGA_CENTROIDS <- matrix(
   data = c(
-    #  FGA        Aneuploidy_Arm_Score   logTMB
+    #  FGA        Aneuploidy_Arm_Score   log_mutation_count
     1.250271,       1.278153,        0.066189,   # Row 1 = GI-High
     -0.538837,      -0.550854,       -0.028526    # Row 2 = GI-Low
   ),
@@ -118,19 +114,18 @@ TCGA_CENTROIDS <- matrix(
   byrow    = TRUE,
   dimnames = list(
     c("GI-High", "GI-Low"),
-    c("FGA", "Aneuploidy_Arm_Score", "logTMB")
+    c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count")
   )
 )
 
 # The order of the columns used throughout the classifier. This ensures that
 # the mean vector, SD vector, and centroid matrix are always aligned.
-FEATURE_ORDER <- c("FGA", "Aneuploidy_Arm_Score", "logTMB")
+FEATURE_ORDER <- c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count")
 
 
-# -----------------------------------------------------------------------------
+# 
 # SECTION 2. THE CLASSIFIER
-# -----------------------------------------------------------------------------
-
+# 
 #' Classify melanoma samples as GI-High or GI-Low
 #'
 #' @param df A data.frame with columns FGA, Aneuploidy_Arm_Score, logTMB.
@@ -139,7 +134,7 @@ FEATURE_ORDER <- c("FGA", "Aneuploidy_Arm_Score", "logTMB")
 #' @export
 classify_GI <- function(df) {
   
-  # ---- 2.1 Validate input ---------------------------------------------------
+  # 2.1 Validate input 
   
   if (!is.data.frame(df)) {
     df <- as.data.frame(df)
@@ -157,7 +152,7 @@ classify_GI <- function(df) {
     )
   }
   
-  # ---- 2.2 Extract and validate feature matrix ------------------------------
+  #  2.2 Extract and validate feature matrix
   
   X <- as.matrix(df[, FEATURE_ORDER, drop = FALSE])
   storage.mode(X) <- "double"
@@ -170,7 +165,7 @@ classify_GI <- function(df) {
     )
   }
   
-  # ---- 2.3 Standardize using TCGA-derived means and SDs ---------------------
+  #2.3 Standardize using TCGA-derived means and SDs 
   #
   # For each feature j:
   #     z_j = (x_j - mean_j) / sd_j
@@ -182,7 +177,7 @@ classify_GI <- function(df) {
   X_centered <- sweep(X, MARGIN = 2, STATS = TCGA_MEANS[FEATURE_ORDER], FUN = "-")
   X_scaled   <- sweep(X_centered, MARGIN = 2, STATS = TCGA_SDS[FEATURE_ORDER], FUN = "/")
   
-  # ---- 2.4 Compute squared Euclidean distance to each centroid -------------
+  # 2.4 Compute squared Euclidean distance to each centroid 
   #
   # For each sample i and centroid k:
   #     d^2(i, k) = sum_j ( z_ij - c_kj )^2
@@ -204,13 +199,12 @@ classify_GI <- function(df) {
   dist_high <- rowSums((X_scaled - high_matrix)^2)
   dist_low  <- rowSums((X_scaled - low_matrix)^2)
   
-  # ---- 2.5 Assign each sample to the nearest centroid ----------------------
+  # 2.5 Assign each sample to the nearest centroid 
   
   phenotype <- ifelse(dist_high < dist_low, "GI-High", "GI-Low")
   cluster   <- ifelse(phenotype == "GI-High", 1L, 2L)
   
-  # ---- 2.6 Return augmented data.frame -------------------------------------
-  
+  #  2.6 Return augmented data.frame 
   out <- df
   out$Cluster      <- cluster
   out$Phenotype    <- factor(phenotype, levels = c("GI-Low", "GI-High"))
@@ -220,12 +214,11 @@ classify_GI <- function(df) {
 }
 
 
-# -----------------------------------------------------------------------------
-# SECTION 3. WORKED EXAMPLE (for documentation purposes)
+# # SECTION 3. WORKED EXAMPLE (for documentation purposes)
 #
 # Running this block reproduces a small demonstration. It is wrapped in
 # if (FALSE) so it does not execute when the file is sourced.
-# -----------------------------------------------------------------------------
+# 
 
 if (FALSE) {
   
@@ -233,14 +226,14 @@ if (FALSE) {
   demo <- data.frame(
     FGA                  = c(0.05, 0.45, 0.62),
     Aneuploidy_Arm_Score = c(2,    18,   27),
-    logTMB               = c(3.2,  6.1,  6.8)
+    log_mutation_count   = c(3.2,  6.1,  6.8)
   )
   
   # Classify
   result <- classify_GI(demo)
   
   # Inspect output
-  print(result[, c("FGA", "Aneuploidy_Arm_Score", "logTMB",
+  print(result[, c("FGA", "Aneuploidy_Arm_Score", "log_mutation_count",
                    "Phenotype", "dist_GI_High", "dist_GI_Low")])
   
   # Expected: sample 1 (low FGA, low aneuploidy) -> GI-Low
@@ -249,7 +242,7 @@ if (FALSE) {
 }
 
 
-# -----------------------------------------------------------------------------
+# 
 # SECTION 4. REPRODUCIBILITY NOTE
 #
 # The classifier above reproduces the exact external validation procedure
@@ -257,5 +250,4 @@ if (FALSE) {
 # feature table (columns FGA, Aneuploidy_Arm_Score, logTMB), running
 # classify_GI() returns the same GI-High / GI-Low assignments that were used
 # in the manuscript.
-# -----------------------------------------------------------------------------
-
+# 
