@@ -25,10 +25,6 @@ cat("\nGI-High is centroid row:", centroid_high, "\n")
 cat("GI-Low  is centroid row:", 3 - centroid_high, "\n")
 
 
-
-
-
-#
 # classify_new_samples.R
 #
 # Purpose
