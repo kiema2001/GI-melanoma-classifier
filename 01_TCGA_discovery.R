@@ -1,8 +1,8 @@
-# =============================================================================
+# 
 # 01_TCGA_discovery.R
 #
 # Purpose
-# -------
+# 
 # Reproduce the TCGA SKCM discovery analysis:
 #   - Compute FGA, arm-level aneuploidy score, and log-transformed
 #     nonsynonymous mutation count
@@ -11,14 +11,14 @@
 #   - Save processed outputs
 #
 # Inputs
-# ------
+# 
 #   TCGA_DIR/data_mutations.txt
 #   TCGA_DIR/data_cna_hg19.seg
 #   TCGA_DIR/data_clinical_patient.txt
 #   TCGA_DIR/data_clinical_sample.txt
 #
 # Outputs (in TCGA_RESULT)
-# ------------------------
+# 
 #   TCGA_FINAL_TWO_PHENOTYPE_MODEL.csv
 #   TCGA_CLUSTER_CENTERS.csv
 #   TCGA_TWO_PHENOTYPE_SUMMARY.csv
